@@ -49,7 +49,7 @@ User Query ──► Bedrock AgentCore Harness ──► MCP Gateway
 
 **Solution:** Configured an AgentCore Gateway (`travel-tools-gateway`) with the correct IAM permissions and attached two discrete MCP Lambda targets (`weather-target`, `attractions-target`).
 
-![Both Lambda functions deployed](images/01-lambda-functions.png)
+![Both Lambda functions deployed](public/lambda-functions.png)
 *Both Lambda functions (`demo3-get-weather`, `demo3-get-top-attractions`) deployed on Python 3.12.*
 
 ### 2. MCP Inline Schema Mapping
@@ -61,10 +61,10 @@ User Query ──► Bedrock AgentCore Harness ──► MCP Gateway
 - **`get_weather`:** requires `city` (string) and `date` (string, `YYYY-MM-DD`)
 - **`get_top_attractions`:** requires `city` (string)
 
-![Gateway targets ready](images/02-gateway-targets.png)
+![Gateway targets ready](public/gateway-targets.png)
 *Both MCP Lambda targets attached to the Gateway and showing a `Ready` status.*
 
-![Gateway details](images/03-gateway-details.png)
+![Gateway details](public/gateway-details.png)
 *The completed `travel-tools-gateway` — MCP protocol type, resource ARN, and IAM role.*
 
 ### 3. Model Tool-Use Sequence Optimization
@@ -75,7 +75,7 @@ User Query ──► Bedrock AgentCore Harness ──► MCP Gateway
 modelStreamErrorException: Model produced invalid sequence as part of ToolUse
 ```
 
-![Nova Pro v1 tool-use error](images/05-nova-pro-v1-error.png)
+![Nova Pro v1 tool-use error](public/bedrock-error.png)
 *Nova Pro v1 breaking tool-use parsing with its own `<thinking>` tokens — the `modelStreamErrorException`.*
 
 **Solution:** Switched the inference model to **Amazon Nova 2 Lite**, which adheres strictly to AgentCore's tool-calling sequence and eliminated the parsing errors.
@@ -86,7 +86,7 @@ modelStreamErrorException: Model produced invalid sequence as part of ToolUse
 
 **Solution:** Refactored the Python 3.12 handlers to consume AgentCore's flat JSON event structure directly (`event.get('city')`, `event.get('date')`), while keeping the multi-city mock data and dynamic attribute evaluation intact.
 
-![AgentCore Harness ready](images/04-harness-details.png)
+![AgentCore Harness ready](public/harness-details.png)
 *The `travel_assistant` AgentCore Harness, deployed and showing a `Ready` status.*
 
 ---
@@ -162,7 +162,7 @@ def lambda_handler(event, context):
 2. Calls `get_top_attractions(city="London")` → 4 attractions (mix of indoor/outdoor).
 3. Synthesizes the result: automatically filters out outdoor activities (Hyde Park, London Eye) and recommends **The British Museum** and **Tate Modern**, tailored with wet-weather context.
 
-![Successful run on Nova 2 Lite](images/06-nova-2-lite-success.png)
+![Successful run on Nova 2 Lite](public/bedrock-success.png)
 *Successful end-to-end run on Nova 2 Lite: parallel tool calls, correct filtering, tailored recommendation.*
 
 This confirms the agent isn't just calling tools — it's reasoning over the combined tool outputs to make a context-aware decision.
