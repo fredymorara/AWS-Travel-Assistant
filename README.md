@@ -2,6 +2,8 @@
 
 An AI-powered travel planning agent built on **AWS Bedrock AgentCore**. The agent autonomously coordinates multiple AWS Lambda tools to fetch weather forecasts, retrieve city attractions, and make contextual, weather-aware recommendations — all orchestrated through the Model Context Protocol (MCP).
 
+**Portfolio Link:** [AWS Bedrock Assistant](https://freddymorara.tech/work/aws-bedrock-assistant)
+
 ---
 
 ## Table of Contents
