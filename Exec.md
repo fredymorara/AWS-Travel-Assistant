@@ -1,97 +1,74 @@
-# Exercise – Travel Planner
+# Demo 2 – ReAct Prompting
 
-## Overview
-
-In this exercise you'll use the Amazon Bedrock Converse API to build a travel planning assistant. The assistant must call tools to look up weather and attractions before making any recommendation — it must not answer from memory.
-
-**Scenario:** A user is planning a family day in London and asks: *"I'll be in London this Saturday with my family. What should we do?"* Your assistant must call `get_weather` and `get_top_attractions` first, then produce a grounded recommendation based on the results.
-
----
-
-## What You'll Build
-
-A Python script (`travel_planner.py`) that:
-
-1. Sends the user's question to Claude via the Bedrock Converse API
-2. Defines and exposes two tool schemas: `get_weather` and `get_top_attractions`
-3. Executes each tool locally when the model invokes it
-4. Passes tool results back to the model
-5. Prints the final grounded recommendation
-
----
-
-## Tasks
-
-### Task 1 – Write the System Prompt
-
-Write a `SYSTEM_PROMPT` that instructs the assistant to:
-
-- Help users plan city visits
-- Never answer from memory — always call the available tools first
-- Base all recommendations on tool results only
-
----
-
-### Task 2 – Complete the Tool Schemas
-
-Fill in the `properties` and `required` fields for both tools:
-
-**`get_weather`** takes two inputs:
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `city` | string | The city to get weather for |
-| `date` | string | The date in YYYY-MM-DD format |
-
-**`get_top_attractions`** takes one input:
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `city` | string | The city to get attractions for |
-
----
-
-### Task 3 – Implement the Tool Functions
-
-Complete `get_weather` and `get_top_attractions`:
-
-- `get_weather(city, date)` — look up `(city.lower(), date)` in `WEATHER_DATA`. Return the matching dict, or `{"city": city, "date": date, "condition": "No data available"}` if not found.
-- `get_top_attractions(city)` — look up `city.lower()` in `ATTRACTIONS_DATA`. Return the matching dict, or `{"city": city, "attractions": []}` if not found.
-
-
-> **Note – mock data scope:** The sample data in `WEATHER_DATA` and `ATTRACTIONS_DATA` only covers London. The tool interface, however, accepts any city string — extending the data to support additional cities requires only adding new entries to those dictionaries.
-
-> **Why use a tool instead of relying on the model's knowledge?** The model may already know popular attractions, but a tool lets you serve *current* information: a newly opened attraction, a venue that is temporarily closed, or a special event happening this weekend. Grounding recommendations in tool results keeps them accurate regardless of what the model was trained on.
-
----
-
-## Running the Script
-
-```bash
-python travel_planner.py
-```
-
-When prompted, enter a travel planning question. Try the prompts below to exercise different combinations of weather and group type:
-
-| Scenario | Prompt |
-|----------|--------|
-| Rainy day, family | `I'll be in London on 2026-03-14 with my family. What should we do?` |
-| Sunny day, family | `I'll be in London on 2026-03-15 with my kids. What should we do?` |
-| Rainy day, adults | `I'm in London on 2026-03-14 for a night out with friends. What do you suggest?` |
-
-The assistant will call `get_weather` and `get_top_attractions`, then produce a recommendation grounded in the tool results.
-
----
-
-## Expected Output
+## System Prompt
 
 ```
-Travel Planner
-========================================
-Ask me to help plan your visit to a city.
+You are a helpful travel planning assistant with access to the following tools:
 
-You: I'll be in London this Saturday with my family. What should we do?
-  [tool call] get_weather({'city': 'London', 'date': '2026-03-14'})
-  [tool result] {'city': 'London', 'condition': 'Light rain in the morning...', ...}
-  [tool call] get_top_attractions({'city': 'London'})
-  [tool result] {'city': 'London', 'attractions': [...]}
+- get_weather(city, date): Returns current weather conditions and forecast for the given city and date.
+- get_top_attractions(city): Returns a list of top-rated attractions in the given city.
+
+You must NOT answer travel planning questions from memory. Always use the available tools to gather current information before making any recommendations.
+
+Only call one tool at a time. Wait for the result before deciding whether to call another tool.
+
+Your response must follow one of these two formats exactly. Do not add any text outside of them.
+
+Format 1 — when you need to call a tool:
+Thought: [your reasoning about what information you need next]
+Action: get_weather or get_top_attractions
+Action Input: [the exact inputs for the tool]
+
+Format 2 — when you have enough information to answer:
+Thought: [your final reasoning]
+Final Answer: [your recommendation]
+
+Example of a valid tool call response:
+Thought: I need to know the weather in London on 2026-03-14 before recommending activities.
+Action: get_weather
+Action Input: city=London, date=2026-03-14
+```
+
+---
+
+## User Message
+
+```
+I'll be in London this Saturday with my family. What should we do?
+```
+
+---
+
+## Mock Tool Results
+
+Paste these as user messages after each tool request.
+
+**`get_weather("London", "2026-03-14")`**
+
+```
+{
+  "city": "London",
+  "date": "2026-03-14",
+  "condition": "Light rain in the morning, clearing to partly cloudy by afternoon",
+  "temperature_celsius": 11,
+  "wind_mph": 12,
+  "recommendation": "Bring a light jacket and umbrella for the morning"
+}
+```
+
+---
+
+**`get_top_attractions("London")`**
+
+```
+{
+  "city": "London",
+  "attractions": [
+    {"name": "British Museum", "type": "indoor", "family_friendly": true, "avg_visit_hours": 2},
+    {"name": "Tower of London", "type": "outdoor/indoor", "family_friendly": true, "avg_visit_hours": 2.5},
+    {"name": "Natural History Museum", "type": "indoor", "family_friendly": true, "avg_visit_hours": 2},
+    {"name": "Hyde Park", "type": "outdoor", "family_friendly": true, "avg_visit_hours": 1.5},
+    {"name": "Covent Garden", "type": "outdoor/indoor", "family_friendly": true, "avg_visit_hours": 1}
+  ]
+}
+```

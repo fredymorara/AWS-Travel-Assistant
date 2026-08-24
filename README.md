@@ -1,6 +1,6 @@
 # Autonomous Travel Assistant with AWS Bedrock AgentCore & Lambda
 
-An AI-powered travel planning agent built on **AWS Bedrock AgentCore**. The agent autonomously coordinates multiple AWS Lambda tools to fetch weather forecasts, retrieve city attractions, and make contextual, weather-aware recommendations — all orchestrated through the Model Context Protocol (MCP).
+An AI-powered travel planning agent built on **AWS Bedrock AgentCore**. The agent autonomously coordinates multiple AWS Lambda tools to fetch weather forecasts, retrieve city attractions, and make contextual, weather-aware recommendations - all orchestrated through the Model Context Protocol (MCP).
 
 **Portfolio Link:** [AWS Bedrock Assistant](https://freddymorara.tech/work/aws-bedrock-assistant)
 
@@ -67,7 +67,7 @@ User Query ──► Bedrock AgentCore Harness ──► MCP Gateway
 *Both MCP Lambda targets attached to the Gateway and showing a `Ready` status.*
 
 ![Gateway details](public/gateway-details.png)
-*The completed `travel-tools-gateway` — MCP protocol type, resource ARN, and IAM role.*
+*The completed `travel-tools-gateway` - MCP protocol type, resource ARN, and IAM role.*
 
 ### 3. Model Tool-Use Sequence Optimization
 
@@ -78,7 +78,7 @@ modelStreamErrorException: Model produced invalid sequence as part of ToolUse
 ```
 
 ![Nova Pro v1 tool-use error](public/bedrock-error.png)
-*Nova Pro v1 breaking tool-use parsing with its own `<thinking>` tokens — the `modelStreamErrorException`.*
+*Nova Pro v1 breaking tool-use parsing with its own `<thinking>` tokens - the `modelStreamErrorException`.*
 
 **Solution:** Switched the inference model to **Amazon Nova 2 Lite**, which adheres strictly to AgentCore's tool-calling sequence and eliminated the parsing errors.
 
@@ -167,7 +167,7 @@ def lambda_handler(event, context):
 ![Successful run on Nova 2 Lite](public/bedrock-success.png)
 *Successful end-to-end run on Nova 2 Lite: parallel tool calls, correct filtering, tailored recommendation.*
 
-This confirms the agent isn't just calling tools — it's reasoning over the combined tool outputs to make a context-aware decision.
+This confirms the agent isn't just calling tools - it's reasoning over the combined tool outputs to make a context-aware decision.
 
 ---
 
@@ -184,7 +184,8 @@ This confirms the agent isn't just calling tools — it's reasoning over the com
 
 ## Key Takeaways
 
-- Cloud AI tooling moves fast — a blueprint written for classic Bedrock Agents was already outdated by the time this project started, requiring an on-the-fly migration to AgentCore.
-- MCP schema validation is strict about structure (top-level arrays vs. nested wrappers) — error messages like `Member must not be null` are a strong signal to check schema nesting first.
+- Cloud AI tooling moves fast - a blueprint written for classic Bedrock Agents was already outdated by the time this project started, requiring an on-the-fly migration to AgentCore.
+- MCP schema validation is strict about structure (top-level arrays vs. nested wrappers) - error messages like `Member must not be null` are a strong signal to check schema nesting first.
 - Not all foundation models handle tool-calling the same way; Nova Pro v1's conversational `<thinking>` tokens broke strict tool-use parsing, while Nova 2 Lite handled it cleanly.
-- Legacy backend contracts (`event['actionGroup']`) don't carry over to newer orchestration layers — payload shapes need to be re-verified whenever the orchestration layer changes.
+- Legacy backend contracts (`event['actionGroup']`) don't carry over to newer orchestration layers - payload shapes need to be re-verified whenever the orchestration layer changes.
+
